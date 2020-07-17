@@ -1,13 +1,28 @@
+{#<!DOCTYPE html>#}
+{#<html lang="en">#}
+{#<head>#}
+{#    <meta charset="UTF-8">#}
+{#    <title>PII Masking</title>#}
+{#</head>#}
+{#<body>#}
+{#<h1> Welcome to PII Masking Tool</h1>#}
+{#<p> This webpage is displayed in html, using Python & Flask as backend & deplyoed on Azure </p>#}
+{#<p> Now we can give user the option to upload file or get a redacted version of the file, for that we can create two more nav links in python#}
+{#which can act like apis.</p>#}
+{#</body>#}
+{#</html>#}
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PII Masking</title>
+    <title>Upload new File</title>
+    <h1>Upload new File</h1>
+    <form action="" method=post enctype=multipart/form-data>
+      <p><input type=file name=file>
+         <input type=submit value=Upload>
+    </form>
 </head>
 <body>
-<h1> Welcome to PII Masking Tool</h1>
-<p> This webpage is displayed in html, using Python & Flask as backend & deplyoed on Azure </p>
-<p> Now we can give user the option to upload file or get a redacted version of the file, for that we can create two more nav links in python
-which can act like apis.</p>
 </body>
 </html>

@@ -14,57 +14,75 @@ connect_str = 'DefaultEndpointsProtocol=https;AccountName=fhirtestingstore;Accou
 
 local_path = "./uploads"
 
+
 @app.route('/')
 def landingPage():
     return render_template('LandingPage.html')
 
-#
-# @app.route('/uploader',meth)
-# def upload_file():
-#     return render_template('index.html')
 
 @app.route('/downloadFile')
 def index():
     path = "FileTOUpload.xlsx"
     return send_file(path, as_attachment=True)
 
+
 @app.route('/uploader', methods=['GET','POST'])
 def upload_files():
     if request.method == 'GET':
         return render_template('index.html')
     if request.method == 'POST':
-        file = request.files['file']
-        filename = secure_filename(file.filename)
-        file_extension = filename.rsplit('.', 1)[1]
-        print(file_extension)
-        file.save(os.path.join(local_path, filename))
+        uploaded_file = request.files.getlist("file[]")
+        # for file in uploaded_file:
+        #     filename = secure_filename(file.filename)
+        #     file_extension = filename.rsplit('.', 1)[1]
+        #     print(filename)
+        #     file.save(os.path.join(local_path, filename))
 
-        local_file_name = filename
-        upload_file_path = os.path.join(local_path, local_file_name)
+        # local_file_name = filename
+        # upload_file_path = os.path.join(local_path, local_file_name)
         try:
             print("Azure Blob storage v12")
             # Create the BlobServiceClient object which will be used to create a container client
             blob_service_client = BlobServiceClient.from_connection_string(connect_str)
 
             # Create a unique name for the container
-            container_name = "container" + str(uuid.uuid4()) + file_extension
+            container_name = "container" + str(uuid.uuid4())
 
             # Create the container
-            container_client = blob_service_client.create_container(container_name)
+            blob_service_client.create_container(container_name)
 
-            # Create a blob client using the local file name as the name for the blob
-            blob_client = blob_service_client.get_blob_client(container=container_name, blob=local_file_name)
+            for file in uploaded_file:
+                filename = secure_filename(file.filename)
+                # file_extension = filename.rsplit('.', 1)[1]
+                print(filename)
+                file.save(os.path.join(local_path, filename))
 
-            print("\nUploading to Azure Storage as blob:\n\t" + local_file_name)
+                local_file_name = filename
+                upload_file_path = os.path.join(local_path, local_file_name)
 
-            # Upload the created file
-            with open(upload_file_path, "rb") as data:
-                blob_client.upload_blob(data)
+                # Create a blob client using the local file name as the name for the blob
+                blob_client = blob_service_client.get_blob_client(container=container_name, blob=local_file_name)
+
+                print("\nUploading to Azure Storage as blob:\n\t" + local_file_name)
+
+                # Upload the created file
+                with open(upload_file_path, "rb") as data:
+                    blob_client.upload_blob(data)
+
+            # List the blobs in the container
+            print("\nList blobs in the container")
+            container = blob_service_client.get_container_client(container=container_name)
+            generator = container.list_blobs()
+            arr = []
+            for blob in generator:
+                print("\t Blob name: " + blob.name)
+                arr.append(blob.name)
+
+            return render_template('result.html', var=arr)
 
         except Exception as ex:
             print('Exception:')
             print(ex)
-    return 'file uploaded successfully'
 
 
 if __name__ == '__main__':

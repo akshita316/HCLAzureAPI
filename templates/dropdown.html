@@ -5,8 +5,12 @@
     <title>get list of blobs</title>
 </head>
 <body>
-<p> Below is the list of blobs you can select to download:
-{{ var }}
-</p>
+    <p> Below is the list of blobs you can select to download:
+    <select name= var method = "GET">
+        {% for blob in var %}
+        <option value= "{{blob}}" SELECTED>{{blob}}</option>"
+        {% endfor %}
+    </select>
+    </p>
 </body>
 </html>

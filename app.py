@@ -12,6 +12,9 @@ app = Flask(__name__)
 connect_str = 'DefaultEndpointsProtocol=https;AccountName=fhirtestingstore;AccountKey=E/bxDh1TGeGnkNT7Y2OVEzE2zmZgpkQ5t9F0suURT7f3FF0kBW4Yu+afr/q28gz9THNbm3zSwfoTeZUXW99vuQ==;EndpointSuffix=core.windows.net'
 # print(connect_str)
 
+# Create the BlobServiceClient object which will be used to create a container client
+blob_service_client = BlobServiceClient.from_connection_string(connect_str)
+
 local_path = "./uploads"
 
 
@@ -20,10 +23,26 @@ def landingPage():
     return render_template('LandingPage.html')
 
 
-@app.route('/downloadFile')
-def index():
-    path = "FileTOUpload.xlsx"
-    return send_file(path, as_attachment=True)
+@app.route('/downloadFile', methods=['GET', 'POST'])
+def getDownloadPage():
+    if request.method == "GET":
+        return render_template("downloadPage.html")
+
+    if request.method == 'POST':
+        container_name = request.form['variable']
+        print("\nList blobs in the container")
+        container = blob_service_client.get_container_client(container=container_name)
+        generator = container.list_blobs()
+        arr = []
+        for blob in generator:
+            print("\t Blob name: " + blob.name)
+            arr.append(blob.name)
+        # print(arr)
+        return render_template('dropdown.html', var=arr)
+
+# def index():
+#     path = "FileTOUpload.xlsx"
+#     return send_file(path, as_attachment=True)
 
 
 @app.route('/uploader', methods=['GET','POST'])
@@ -32,18 +51,8 @@ def upload_files():
         return render_template('index.html')
     if request.method == 'POST':
         uploaded_file = request.files.getlist("file[]")
-        # for file in uploaded_file:
-        #     filename = secure_filename(file.filename)
-        #     file_extension = filename.rsplit('.', 1)[1]
-        #     print(filename)
-        #     file.save(os.path.join(local_path, filename))
-
-        # local_file_name = filename
-        # upload_file_path = os.path.join(local_path, local_file_name)
         try:
             print("Azure Blob storage v12")
-            # Create the BlobServiceClient object which will be used to create a container client
-            blob_service_client = BlobServiceClient.from_connection_string(connect_str)
 
             # Create a unique name for the container
             container_name = "container" + str(uuid.uuid4())

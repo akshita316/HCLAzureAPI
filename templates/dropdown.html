@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>get list of blobs</title>
+</head>
+<body>
+    <p> Below is the list of blobs you can select to download:</p>
+    <p>
+
+    <form method="POST" action="/downloader">
+        <select multiple id="multiple" name= "blob_list" method = "POST">
+            {% for blob in var %}
+            <option value= "{{blob}}">{{blob}}</option>"
+            {% endfor %}
+        </select>
+        <button type="submit">Submit </button>
+    </form>
+{#    <form method = "post">#}
+{#       <select name= var >#}
+{#          {% for blob in var %}#}
+{#        <option value= "{{blob}}" SELECTED>{{blob}}</option>"#}
+{#        {% endfor %}#}
+{#       </select>#}
+{#       <input type = "submit" value = "Submit"/>#}
+{#    </form>#}
+    </p>
+</body>
+</html>

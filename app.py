@@ -1,4 +1,3 @@
-
 import os, uuid
 from flask import Flask, request, render_template
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
@@ -23,6 +22,15 @@ def landingPage():
     return render_template('LandingPage.html')
 
 
+@app.route('/downloader', methods=['GET', 'POST'])
+def download():
+    if request.method == 'GET':
+        return "you requested for downloader API"
+
+    if request.method == "POST":
+        blob_value = request.form.getlist('blob_list')
+        return str(blob_value)
+
 @app.route('/downloadFile', methods=['GET', 'POST'])
 def getDownloadPage():
     if request.method == "GET":
@@ -40,12 +48,8 @@ def getDownloadPage():
         # print(arr)
         return render_template('dropdown.html', var=arr)
 
-# def index():
-#     path = "FileTOUpload.xlsx"
-#     return send_file(path, as_attachment=True)
 
-
-@app.route('/uploader', methods=['GET','POST'])
+@app.route('/uploader', methods=['GET', 'POST'])
 def upload_files():
     if request.method == 'GET':
         return render_template('index.html')

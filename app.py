@@ -1,4 +1,3 @@
-
 import os, uuid
 from flask import Flask, request, render_template
 from azure.storage.blob import BlobServiceClient, BlobClient, ContainerClient
@@ -15,12 +14,29 @@ connect_str = 'DefaultEndpointsProtocol=https;AccountName=fhirtestingstore;Accou
 # Create the BlobServiceClient object which will be used to create a container client
 blob_service_client = BlobServiceClient.from_connection_string(connect_str)
 
-local_path = "./uploads"
 
+local_path = "./uploads"
+download_path = "./downloads"
 
 @app.route('/')
 def landingPage():
     return render_template('LandingPage.html')
+
+
+@app.route('/downloader', methods=['GET', 'POST'])
+def download():
+    if request.method == 'GET':
+        return "you requested for downloader API"
+    if request.method == "POST":
+        blob_value = request.form.getlist('blob_list')
+        for file_name in blob_value:
+            blob_client = blob_service_client.get_blob_client(container='container1f303a5e-36e1-4021-a1a6-f76169703c6f', blob=file_name)
+            full_path_to_file2 = os.path.join(download_path, str.replace(
+                file_name, '.txt', '_DOWNLOADED.txt'))
+            print("\nDownloading blob to " + full_path_to_file2)
+            with open(full_path_to_file2, "wb") as my_blob:
+                my_blob.writelines([blob_client.download_blob().readall()])
+    return str(blob_value)
 
 
 @app.route('/downloadFile', methods=['GET', 'POST'])
@@ -40,12 +56,8 @@ def getDownloadPage():
         # print(arr)
         return render_template('dropdown.html', var=arr)
 
-# def index():
-#     path = "FileTOUpload.xlsx"
-#     return send_file(path, as_attachment=True)
 
-
-@app.route('/uploader', methods=['GET','POST'])
+@app.route('/uploader', methods=['GET', 'POST'])
 def upload_files():
     if request.method == 'GET':
         return render_template('index.html')

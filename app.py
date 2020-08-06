@@ -16,7 +16,8 @@ blob_service_client = BlobServiceClient.from_connection_string(connect_str)
 
 
 local_path = "./uploads"
-download_path = "./downloads"
+# download_path = "./downloads"
+
 
 @app.route('/')
 def landingPage():
@@ -28,10 +29,12 @@ def download():
     if request.method == 'GET':
         return "you requested for downloader API"
     if request.method == "POST":
+        container_name = request.form['container']
+        download_loc = request.form['download path']
         blob_value = request.form.getlist('blob_list')
         for file_name in blob_value:
-            blob_client = blob_service_client.get_blob_client(container='container1f303a5e-36e1-4021-a1a6-f76169703c6f', blob=file_name)
-            full_path_to_file2 = os.path.join(download_path, str.replace(
+            blob_client = blob_service_client.get_blob_client(container=container_name, blob=file_name)
+            full_path_to_file2 = os.path.join(download_loc, str.replace(
                 file_name, '.txt', '_DOWNLOADED.txt'))
             print("\nDownloading blob to " + full_path_to_file2)
             with open(full_path_to_file2, "wb") as my_blob:
@@ -45,16 +48,19 @@ def getDownloadPage():
         return render_template("downloadPage.html")
 
     if request.method == 'POST':
-        container_name = request.form['variable']
+
+
+        container_name = request.form['container_var']
+
         print("\nList blobs in the container")
         container = blob_service_client.get_container_client(container=container_name)
         generator = container.list_blobs()
         arr = []
         for blob in generator:
-            print("\t Blob name: " + blob.name)
+            # print("\t Blob name: " + blob.name)
             arr.append(blob.name)
         # print(arr)
-        return render_template('dropdown.html', var=arr)
+        return render_template('dropdown.html', var=arr, container=container_name)
 
 
 @app.route('/uploader', methods=['GET', 'POST'])

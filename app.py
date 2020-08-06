@@ -14,6 +14,7 @@ connect_str = 'DefaultEndpointsProtocol=https;AccountName=fhirtestingstore;Accou
 # Create the BlobServiceClient object which will be used to create a container client
 blob_service_client = BlobServiceClient.from_connection_string(connect_str)
 
+
 local_path = "./uploads"
 # download_path = "./downloads"
 
@@ -48,7 +49,9 @@ def getDownloadPage():
 
     if request.method == 'POST':
 
+
         container_name = request.form['container_var']
+
         print("\nList blobs in the container")
         container = blob_service_client.get_container_client(container=container_name)
         generator = container.list_blobs()

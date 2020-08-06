@@ -5,25 +5,20 @@
     <title>get list of blobs</title>
 </head>
 <body>
-    <p> Below is the list of blobs you can select to download:</p>
+    <p> Below is the list of blobs you can select to download from container:</p>
     <p>
-
     <form method="POST" action="/downloader">
+        <input name= "container" style="width:30%" value= {{ container }}>
+    <p></p>
         <select multiple id="multiple" name= "blob_list" method = "POST">
             {% for blob in var %}
             <option value= "{{blob}}">{{blob}}</option>"
             {% endfor %}
         </select>
+        <input name="download path" style="width: 30%">
+{#        <input type="file" id="ctrl" webkitdirectory directory multiple/>#}
         <button type="submit">Submit </button>
     </form>
-{#    <form method = "post">#}
-{#       <select name= var >#}
-{#          {% for blob in var %}#}
-{#        <option value= "{{blob}}" SELECTED>{{blob}}</option>"#}
-{#        {% endfor %}#}
-{#       </select>#}
-{#       <input type = "submit" value = "Submit"/>#}
-{#    </form>#}
     </p>
 </body>
 </html>

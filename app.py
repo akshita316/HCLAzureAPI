@@ -15,7 +15,7 @@ connect_str = 'DefaultEndpointsProtocol=https;AccountName=fhirtestingstore;Accou
 blob_service_client = BlobServiceClient.from_connection_string(connect_str)
 
 local_path = "./uploads"
-
+download_path = "./downloads"
 
 @app.route('/')
 def landingPage():
@@ -26,10 +26,16 @@ def landingPage():
 def download():
     if request.method == 'GET':
         return "you requested for downloader API"
-
     if request.method == "POST":
         blob_value = request.form.getlist('blob_list')
-        return str(blob_value)
+        for file_name in blob_value:
+            blob_client = blob_service_client.get_blob_client(container='container1f303a5e-36e1-4021-a1a6-f76169703c6f', blob=file_name)
+            full_path_to_file2 = os.path.join(download_path, str.replace(
+                file_name, '.txt', '_DOWNLOADED.txt'))
+            print("\nDownloading blob to " + full_path_to_file2)
+            with open(full_path_to_file2, "wb") as my_blob:
+                my_blob.writelines([blob_client.download_blob().readall()])
+    return str(blob_value)
 
 @app.route('/downloadFile', methods=['GET', 'POST'])
 def getDownloadPage():
@@ -37,6 +43,7 @@ def getDownloadPage():
         return render_template("downloadPage.html")
 
     if request.method == 'POST':
+
         container_name = request.form['variable']
         print("\nList blobs in the container")
         container = blob_service_client.get_container_client(container=container_name)
